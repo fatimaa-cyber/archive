@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion Archives Hopital</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="kicker">Hopital public</p>
+        <h1>Gestion des archives des dossiers patients</h1>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-light" id="addServiceBtn" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Ajouter service
+        </button>
+        <button class="btn btn-light" id="backupBtn" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 4-4m-4 4-4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+          Sauvegarde JSON
+        </button>
+        <button class="btn btn-primary" id="addBtn" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Ajouter dossier
+        </button>
+      </div>
+    </header>
+
+    <section class="filters" aria-label="Filtres">
+      <label>
+        Recherche
+        <input id="searchInput" type="search" placeholder="Nom, CIN, numero, IP patient">
+      </label>
+      <label>
+        Service
+        <select id="serviceFilter">
+          <option value="">Tous les services</option>
+        </select>
+      </label>
+      <label>
+        IP patient
+        <input id="ipFilter" type="text" placeholder="Ex: IP12345">
+      </label>
+      <label>
+        Date d'entree
+        <input id="dateEntreeFilter" type="date">
+      </label>
+      <label>
+        Date de sortie
+        <input id="dateSortieFilter" type="date">
+      </label>
+      <button class="btn btn-light" id="resetFiltersBtn" type="button">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v6h6"/></svg>
+        Reinitialiser
+      </button>
+    </section>
+
+    <section class="table-section">
+      <div class="table-header">
+        <h2>Dossiers archives</h2>
+        <span id="counter">0 dossier</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Numero</th>
+              <th>Service</th>
+              <th>Dates</th>
+              <th>Mouvement</th>
+              <th>Cause</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="dossiersBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyState">Aucun dossier trouve.</div>
+      </div>
+      <div class="pagination">
+        <label class="page-size">
+          Lignes par page
+          <select id="pageSizeSelect">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </label>
+        <div class="page-controls">
+          <button class="btn btn-light action-icon" id="prevPageBtn" type="button" aria-label="Page precedente">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <span id="pageInfo">Page 1 / 1</span>
+          <button class="btn btn-light action-icon" id="nextPageBtn" type="button" aria-label="Page suivante">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="dossierModal" aria-hidden="true">
+    <form class="modal-panel" id="dossierForm" novalidate>
+      <div class="modal-header">
+        <h2 id="dialogTitle">Ajouter dossier</h2>
+        <button class="icon-btn" id="closeDialogBtn" type="button" aria-label="Fermer">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <input id="dossierId" type="hidden">
+
+      <div class="form-grid">
+        <label>
+          Nom *
+          <input id="nom" name="nom" type="text" required>
+        </label>
+        <label>
+          Prenom *
+          <input id="prenom" name="prenom" type="text" required>
+        </label>
+        <label>
+          IP patient *
+          <input id="ip_patient" name="ip_patient" type="text" required>
+        </label>
+        <label>
+          CIN
+          <input id="cin" name="cin" type="text">
+        </label>
+        <label>
+          Numero du dossier *
+          <input id="numero" name="numero" type="text" required>
+        </label>
+        <label>
+          Service *
+          <select id="service" name="service" required></select>
+        </label>
+        <label>
+          Medecin
+          <input id="medecin" name="medecin" type="text">
+        </label>
+        <label>
+          Date d'entree *
+          <input id="date_entree" name="date_entree" type="date" required>
+        </label>
+        <label>
+          Date de sortie
+          <input id="date_sortie" name="date_sortie" type="date">
+        </label>
+        <label id="mouvementGroup">
+          Mouvement *
+          <select id="mouvement" name="mouvement" required></select>
+        </label>
+        <label id="dateMouvementGroup">
+          Date du mouvement *
+          <input id="date_mouvement" name="date_mouvement" type="date" required>
+        </label>
+        <label class="full" id="causeGroup">
+          Cause du mouvement *
+          <textarea id="cause" name="cause" rows="3" required></textarea>
+        </label>
+      </div>
+
+      <p class="form-error" id="formError" role="alert"></p>
+
+      <div class="modal-actions">
+        <button class="btn btn-light" id="cancelBtn" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          Annuler
+        </button>
+        <button class="btn btn-primary" type="submit">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+          Enregistrer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal hidden" id="serviceModal" aria-hidden="true">
+    <form class="modal-panel service-panel" id="serviceForm" novalidate>
+      <div class="modal-header">
+        <h2>Ajouter service</h2>
+        <button class="icon-btn" id="closeServiceDialogBtn" type="button" aria-label="Fermer">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <label>
+        Nom du service *
+        <input id="newServiceName" name="newServiceName" type="text" required>
+      </label>
+
+      <p class="form-error" id="serviceFormError" role="alert"></p>
+
+      <div class="modal-actions">
+        <button class="btn btn-light" id="cancelServiceBtn" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          Annuler
+        </button>
+        <button class="btn btn-primary" type="submit">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+          Enregistrer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
