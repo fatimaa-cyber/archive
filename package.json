@@ -1,0 +1,49 @@
+{
+  "name": "gestion-archives-hopital",
+  "version": "1.0.5",
+  "description": "Logiciel desktop de gestion des archives des dossiers patients.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --win --dir",
+    "build": "electron-builder --win"
+  },
+  "keywords": [
+    "electron",
+    "archives",
+    "hopital",
+    "ofppt"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "ma.hopital.archives",
+    "productName": "Gestion Archives Hopital",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "build/**/*",
+      "renderer/**/*",
+      "data/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Gestion Archives Hopital"
+    }
+  }
+}
